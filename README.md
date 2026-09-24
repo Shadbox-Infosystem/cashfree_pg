@@ -1,43 +1,70 @@
-# CashfreePg
+# cashfree_pg
 
-TODO: Delete this and the text below, and describe your gem
+[![CI](https://github.com/muballighshahid-dot/cashfree_pg/actions/workflows/ci.yml/badge.svg)](https://github.com/muballighshahid-dot/cashfree_pg/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.txt)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/cashfree_pg`. To experiment with that code, run `bin/console` for an interactive prompt.
+An unofficial Ruby client for the [Cashfree Payments](https://www.cashfree.com) API: orders, payments, UPI, refunds, payment links and webhook verification.
+
+> **Status:** under active development. Not yet released to RubyGems. The public API may change before v1.0.
+>
+> This project is not affiliated with, endorsed by, or supported by Cashfree Payments.
+
+## Goals
+
+- Instance-based, thread-safe client with per-client credentials
+- Cashfree API version pinning with per-client override
+- Exact money handling (`BigDecimal`, never `Float`)
+- Safe webhook verification (raw body, constant-time comparison)
+- Secrets and personal data never logged or shown in errors
+- Faraday as the only runtime dependency; Rails optional
+
+See the [project plan](docs/cashfree_pg_project_plan.md) and [decision log](docs/decisions.md) for details.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+The gem is not published yet. Installation instructions will be added with the v0.1.0 release.
 
-Install the gem and add to the application's Gemfile by executing:
+## Quick start
 
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+Coming in v0.1.0. The target usage is:
+
+```ruby
+client = CashfreePg::Client.new(
+  client_id:     ENV.fetch("CASHFREE_CLIENT_ID"),
+  client_secret: ENV.fetch("CASHFREE_CLIENT_SECRET"),
+  environment:   :sandbox
+)
+
+order = client.orders.create(
+  order_amount:     "10.10",
+  order_currency:   "INR",
+  customer_details: { customer_id: "cust_1", customer_phone: "9999999999" }
+)
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+## Requirements
 
-```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
-```
-
-## Usage
-
-TODO: Write usage instructions here
+- Ruby 3.3 or newer
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+```bash
+bin/setup                 # install dependencies
+cp .env.example .env      # optional: add SANDBOX credentials for bin/console
+bundle exec rake          # specs, RuboCop and gem contents check
+bin/console               # interactive prompt
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Never commit `.env` or real credentials. Use Cashfree sandbox credentials only.
+
+## Security
+
+Please do not report vulnerabilities in public issues. See [SECURITY.md](SECURITY.md).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/cashfree_pg. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/cashfree_pg/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) first. Everyone interacting with the project is expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the CashfreePg project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/cashfree_pg/blob/master/CODE_OF_CONDUCT.md).
+Available as open source under the terms of the [MIT License](LICENSE.txt).
