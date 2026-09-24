@@ -62,7 +62,17 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: gitleaks
-        uses: gitleaks/gitleaks-action@v2
+      # The CLI scans the whole history on every event and needs no GitHub API access,
+      # unlike gitleaks-action, which only scans PR commits and needs pull-requests: read.
+      - name: Install gitleaks (checksum verified)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_VERSION: 8.24.3
+        run: |
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfLO "${base}/${archive}"
+          curl -sSfLO "${base}/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          sha256sum --check --ignore-missing "gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          tar -xzf "${archive}" gitleaks
+      - name: gitleaks (full history, secrets redacted in output)
+        run: ./gitleaks git --redact --verbose --exit-code 1 .
