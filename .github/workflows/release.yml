@@ -1,0 +1,41 @@
+name: Release
+
+# Publishes to RubyGems using trusted publishing (OIDC). No RubyGems API key is stored anywhere.
+# One-time setup: add this repository and workflow as a trusted publisher on rubygems.org,
+# and create a protected "release" environment in the GitHub repository settings.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+      - name: Check tag matches gem version
+        run: |
+          gem_version=$(ruby -r ./lib/cashfree_pg/version -e 'print CashfreePg::VERSION')
+          if [ "v${gem_version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match gem version v${gem_version}"
+            exit 1
+          fi
+      - name: Full check before publishing
+        run: bundle exec rake
+      - name: Publish to RubyGems
+        uses: rubygems/release-gem@v1

@@ -4,8 +4,21 @@
 require "bundler/setup"
 require "cashfree_pg"
 
-# You can add fixtures and/or initialization code here to make experimenting
-# with your gem easier. You can also use a different console, if you like.
+# Loads sandbox credentials from a local .env file (git-ignored) without adding a dependency.
+env_file = File.expand_path("../.env", __dir__)
+if File.exist?(env_file)
+  File.foreach(env_file) do |line|
+    line = line.strip
+    next if line.empty? || line.start_with?("#")
+
+    key, value = line.split("=", 2)
+    ENV[key] ||= value.to_s if key && !key.empty?
+  end
+end
+
+if ENV.fetch("CASHFREE_ENVIRONMENT", "sandbox") != "sandbox"
+  abort "bin/console only supports CASHFREE_ENVIRONMENT=sandbox. Never use production credentials here."
+end
 
 require "irb"
 IRB.start(__FILE__)

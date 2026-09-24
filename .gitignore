@@ -6,6 +6,15 @@
 /pkg/
 /spec/reports/
 /tmp/
+*.gem
 
 # rspec failure tracking
 .rspec_status
+
+# Secrets: never commit real credentials or keys
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+/spec/fixtures/**/*.local.*
