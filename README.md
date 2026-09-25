@@ -3,7 +3,7 @@
 [![CI](https://github.com/muballighshahid-dot/cashfree_pg/actions/workflows/ci.yml/badge.svg)](https://github.com/muballighshahid-dot/cashfree_pg/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.txt)
 
-An unofficial Ruby client for the [Cashfree Payments](https://www.cashfree.com) API: orders, payments, UPI, refunds, payment links and webhook verification.
+An unofficial Ruby client for the [Cashfree Payments](https://www.cashfree.com) API: orders, payments (including UPI), refunds, payment links and webhook verification.
 
 > **Status:** under active development. Not yet released to RubyGems. The public API may change before v1.0.
 >
@@ -15,8 +15,8 @@ An unofficial Ruby client for the [Cashfree Payments](https://www.cashfree.com) 
 - Cashfree API version pinning with per-client override
 - Exact money handling (`BigDecimal`, never `Float`)
 - Safe webhook verification (raw body, constant-time comparison)
-- Secrets and personal data never logged or shown in errors
-- Faraday as the only runtime dependency; Rails optional
+- Secrets never shown in `inspect` or error messages
+- Faraday as the only runtime dependency
 
 See the [project plan](docs/cashfree_pg_project_plan.md) and [decision log](docs/decisions.md) for details.
 
@@ -40,7 +40,13 @@ order = client.orders.create(
   order_currency:   "INR",
   customer_details: { customer_id: "cust_1", customer_phone: "9999999999" }
 )
+
+# UPI intent (Cashfree channel "link"). The gem calls Cashfree only, never NPCI or a bank.
+# Collect is legacy and needs a VPA, for example the sandbox value "testsuccess@gocash".
+client.payments.upi(order, channel: :intent)
 ```
+
+Order Pay from your server needs the S2S feature switched on in the Cashfree dashboard. A 403 means it is not enabled.
 
 ## Requirements
 

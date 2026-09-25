@@ -6,7 +6,7 @@ require_relative "request"
 module CashfreePg
   # One merchant's credentials and the calls made with them.
   #
-  # Resource accessors (`orders`, `payments`, `refunds`, `payment_links`) are added in later phases.
+  # `refunds` and `payment_links` are added in a later phase.
   #
   # @example
   #   client = CashfreePg::Client.new(
@@ -79,6 +79,20 @@ module CashfreePg
     #   client.post("/orders", { order_amount: "10.10", order_currency: "INR" })
     def post(path, body = nil, skip_auth: false, idempotency_key: nil)
       call(:post, path, body: body, skip_auth: skip_auth, idempotency_key: idempotency_key)
+    end
+
+    # @return [Orders]
+    # @example
+    #   client.orders.create(order_amount: "10.10", order_currency: "INR")
+    def orders
+      @orders ||= Orders.new(self)
+    end
+
+    # @return [Payments]
+    # @example
+    #   client.payments.upi(order, channel: :intent)
+    def payments
+      @payments ||= Payments.new(self)
     end
 
     # @return [String] client secret is always `[FILTERED]`
