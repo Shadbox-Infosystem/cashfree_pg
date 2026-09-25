@@ -1,0 +1,17 @@
+{
+  "cf_link_id": "1996567",
+  "link_id": "link_123",
+  "link_status": "ACTIVE",
+  "link_currency": "INR",
+  "link_amount": 10.10,
+  "link_purpose": "Test payment",
+  "customer_details": {
+    "customer_phone": "9999999999",
+    "customer_email": "test@example.com"
+  },
+  "link_url": "https://payments-test.cashfree.com/links/link_123",
+  "link_notify": {
+    "send_sms": false,
+    "send_email": false
+  }
+}

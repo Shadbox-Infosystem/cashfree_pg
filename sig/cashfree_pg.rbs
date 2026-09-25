@@ -70,6 +70,8 @@ module CashfreePg
     def post: (String path, ?Hash[untyped, untyped]? body, ?skip_auth: bool, ?idempotency_key: String?) -> Response
     def orders: () -> Orders
     def payments: () -> Payments
+    def refunds: () -> Refunds
+    def payment_links: () -> PaymentLinks
     def inspect: () -> String
     def to_s: () -> String
   end
@@ -83,6 +85,20 @@ module CashfreePg
     def initialize: (Client client) -> void
     def create: (Hash[untyped, untyped] attrs) -> Response
     def fetch: (String order_id) -> Response
+  end
+
+  class Refunds
+    def initialize: (Client client) -> void
+    def create: (String order_id, ?idempotency_key: String?, **untyped) -> Response
+    def fetch: (String order_id, String refund_id) -> Response
+    def list: (String order_id) -> Response
+  end
+
+  class PaymentLinks
+    def initialize: (Client client) -> void
+    def create: (?idempotency_key: String?, **untyped) -> Response
+    def fetch: (String link_id) -> Response
+    def cancel: (String link_id) -> Response
   end
 
   class Payments
