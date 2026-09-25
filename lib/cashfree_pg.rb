@@ -9,6 +9,7 @@ require_relative "cashfree_pg/refunds"
 require_relative "cashfree_pg/payment_links"
 require_relative "cashfree_pg/orders"
 require_relative "cashfree_pg/payments"
+require_relative "cashfree_pg/webhook"
 
 # Ruby client for the Cashfree Payments API.
 module CashfreePg

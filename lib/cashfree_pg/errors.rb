@@ -69,4 +69,7 @@ module CashfreePg
 
   # The call timed out and was not retried. For POST, fetch the resource before trying again.
   class TimeoutError < Error; end
+
+  # The webhook signature, headers, or body could not be trusted.
+  class SignatureVerificationError < Error; end
 end
