@@ -1,0 +1,11 @@
+[
+  {
+    "cf_refund_id": "1553338",
+    "refund_id": "refund_00912",
+    "order_id": "order_123",
+    "entity": "refund",
+    "refund_amount": 10.10,
+    "refund_currency": "INR",
+    "refund_status": "SUCCESS"
+  }
+]

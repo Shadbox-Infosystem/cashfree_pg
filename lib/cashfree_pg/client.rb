@@ -6,7 +6,7 @@ require_relative "request"
 module CashfreePg
   # One merchant's credentials and the calls made with them.
   #
-  # `refunds` and `payment_links` are added in a later phase.
+  # Checkout, refunds and payment links are available on this client.
   #
   # @example
   #   client = CashfreePg::Client.new(
@@ -79,6 +79,20 @@ module CashfreePg
     #   client.post("/orders", { order_amount: "10.10", order_currency: "INR" })
     def post(path, body = nil, skip_auth: false, idempotency_key: nil)
       call(:post, path, body: body, skip_auth: skip_auth, idempotency_key: idempotency_key)
+    end
+
+    # @return [Refunds]
+    # @example
+    #   client.refunds.create("order_123", refund_amount: "10.10", refund_id: "refund_00912")
+    def refunds
+      @refunds ||= Refunds.new(self)
+    end
+
+    # @return [PaymentLinks]
+    # @example
+    #   client.payment_links.fetch("link_123")
+    def payment_links
+      @payment_links ||= PaymentLinks.new(self)
     end
 
     # @return [Orders]
