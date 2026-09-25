@@ -119,6 +119,7 @@ DEPENDENCIES
   cashfree_pg!
   irb
   rake (~> 13.0)
+  rbs (~> 4.0)
   rspec (~> 3.13)
   rubocop (~> 1.21)
   simplecov (~> 0.22)

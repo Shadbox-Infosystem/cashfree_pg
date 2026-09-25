@@ -6,8 +6,6 @@ on:
       - main
       - dev
   pull_request:
-  schedule:
-    - cron: "0 3 * * 1"
 
 permissions:
   contents: read

@@ -1,4 +1,85 @@
 module CashfreePg
   VERSION: String
-  # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+
+  class Error < StandardError
+    attr_reader status: Integer?
+    attr_reader code: String?
+    attr_reader type: String?
+    attr_reader request_id: String?
+    attr_reader raw_body: String?
+
+    def initialize: (?String? message, ?status: Integer?, ?code: String?, ?type: String?, ?request_id: String?, ?raw_body: String?) -> void
+    def inspect: () -> String
+  end
+
+  class InvalidRequestError < Error
+  end
+
+  class AuthenticationError < Error
+  end
+
+  class PermissionError < Error
+  end
+
+  class NotFoundError < Error
+  end
+
+  class ConflictError < Error
+  end
+
+  class ValidationError < Error
+  end
+
+  class RateLimitError < Error
+  end
+
+  class APIError < Error
+  end
+
+  class ConnectionError < Error
+  end
+
+  class TimeoutError < Error
+  end
+
+  class Response
+    attr_reader status: Integer
+    attr_reader request_id: String
+
+    def initialize: (Hash[String, untyped] | Array[untyped] data, status: Integer, request_id: String) -> void
+    def []: (String | Symbol key) -> untyped
+    def dig: (*String | Symbol keys) -> untyped
+    def to_h: () -> (Hash[String, untyped] | Array[untyped])
+  end
+
+  class Client
+    SANDBOX_URL: String
+    PRODUCTION_URL: String
+    DEFAULT_API_VERSION: String
+
+    attr_reader client_id: String
+    attr_reader client_secret: String
+    attr_reader environment: Symbol
+    attr_reader api_version: String
+    attr_reader open_timeout: Numeric
+    attr_reader read_timeout: Numeric
+    attr_reader base_url: String
+
+    def initialize: (client_id: String, client_secret: String, ?environment: Symbol, ?api_version: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?base_url: String?, ?allow_custom_base_url: bool) -> void
+    def get: (String path, ?Hash[untyped, untyped]? params, ?skip_auth: bool) -> Response
+    def post: (String path, ?Hash[untyped, untyped]? body, ?skip_auth: bool, ?idempotency_key: String?) -> Response
+    def inspect: () -> String
+    def to_s: () -> String
+  end
+
+  class Request
+    def initialize: (Client client, untyped connection) -> void
+    def perform: (Symbol method, String path, ?body: Hash[untyped, untyped]?, ?params: Hash[untyped, untyped]?, ?skip_auth: bool, ?idempotency_key: String?) -> Response
+  end
+
+  module Money
+    def self.normalize: (untyped value) -> untyped
+    def self.coerce: (untyped value) -> untyped
+    def self.format_number: (untyped decimal) -> String
+  end
 end
