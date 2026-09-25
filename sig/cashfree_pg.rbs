@@ -42,6 +42,9 @@ module CashfreePg
   class TimeoutError < Error
   end
 
+  class SignatureVerificationError < Error
+  end
+
   class Response
     attr_reader status: Integer
     attr_reader request_id: String
@@ -109,6 +112,21 @@ module CashfreePg
     def fetch: (String order_id, String cf_payment_id) -> Response
     def upi: (untyped order, channel: Symbol | String, ?upi_id: String?, ?upi_expiry_minutes: Integer?, ?upi_redirect_url: bool?) -> Response
     def authorize: (String order_id, action: Symbol | String, ?amount: untyped?, ?idempotency_key: String?) -> Response
+  end
+
+  class Webhook
+    class Event
+      attr_reader type: String?
+      attr_reader time: String?
+      attr_reader data: untyped
+      attr_reader version: String?
+
+      def initialize: (type: String?, time: String?, data: untyped, version: String?) -> void
+    end
+
+    def self.construct_event: (raw_body: String, headers: untyped, secret: String, ?tolerance: Numeric?) -> Event
+    def initialize: (String raw_body, untyped headers, String secret, Numeric? tolerance) -> void
+    def construct: () -> Event
   end
 
   module Money
