@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "cgi"
+require "uri"
 
 module CashfreePg
   # Create and fetch Cashfree orders.
@@ -37,7 +37,7 @@ module CashfreePg
       raise ArgumentError, "order_id is required" if text.empty?
       raise ArgumentError, "order_id must not contain a slash" if text.include?("/")
 
-      CGI.escapeURIComponent(text)
+      URI.encode_uri_component(text)
     end
   end
 end

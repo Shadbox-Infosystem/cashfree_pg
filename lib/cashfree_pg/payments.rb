@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "cgi"
+require "uri"
 
 module CashfreePg
   # Payments for an order, including UPI via Cashfree order sessions.
@@ -135,7 +135,7 @@ module CashfreePg
       raise ArgumentError, "#{name} is required" if text.empty?
       raise ArgumentError, "#{name} must not contain a slash" if text.include?("/")
 
-      CGI.escapeURIComponent(text)
+      URI.encode_uri_component(text)
     end
   end
 end
