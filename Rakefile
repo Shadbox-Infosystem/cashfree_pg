@@ -29,4 +29,9 @@ namespace :package do
   end
 end
 
-task default: %i[spec rubocop package:check]
+desc "Validate RBS signatures in sig/"
+task :rbs do
+  sh "rbs", "-I", "sig", "validate"
+end
+
+task default: %i[spec rubocop rbs package:check]
