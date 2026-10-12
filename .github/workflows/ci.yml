@@ -28,7 +28,7 @@ jobs:
           - "3.4"
           - ruby
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Set up Ruby
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Dependency audit
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Set up Ruby
@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Secret scan (full history)
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
