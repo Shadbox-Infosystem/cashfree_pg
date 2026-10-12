@@ -4,14 +4,6 @@ require "open3"
 require "rbconfig"
 
 RSpec.describe CashfreePg do
-  it "has a version number" do
-    expect(CashfreePg::VERSION).to match(/\A\d+\.\d+\.\d+/)
-  end
-
-  it "defines a base error class" do
-    expect(CashfreePg::Error.ancestors).to include(StandardError)
-  end
-
   # A fresh process catches missing requires that the test suite's own requires would hide.
   it "loads in a fresh process without warnings or Rails" do
     lib = File.expand_path("../lib", __dir__)

@@ -14,4 +14,3 @@
 - [ ] No `Float` used for amounts; no POST is auto-retried
 - [ ] Public methods have a short YARD comment; README updated if behaviour changed
 - [ ] `CHANGELOG.md` updated for user-visible changes
-- [ ] `docs/decisions.md` updated for significant choices

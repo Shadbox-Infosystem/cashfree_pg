@@ -9,7 +9,9 @@ An unofficial Ruby client for the [Cashfree Payments](https://www.cashfree.com) 
 >
 > v0.1.0 is ready in this repository. It is not on RubyGems until the `v0.1.0` tag is pushed. The public API may change before v1.0.
 
-The gem talks only to Cashfree over HTTPS. It never connects to NPCI or a bank, and it never sends raw card data.
+The gem talks only to Cashfree over HTTPS. It never connects to NPCI or a bank, and it never sends raw card data. It has no telemetry: no analytics, no error reporting service, and no request logging.
+
+Every method, its Cashfree endpoint, and a link to Cashfree's reference are listed in [docs/api.md](docs/api.md).
 
 ## Installation
 
@@ -41,6 +43,7 @@ The default API version is `2025-01-01`. Pass `api_version:` to pin another vers
 
 ```ruby
 order = client.orders.create(
+  order_id:         "order_123",
   order_amount:     "10.10",
   order_currency:   "INR",
   customer_details: { customer_id: "cust_1", customer_phone: "9999999999" }
@@ -48,9 +51,12 @@ order = client.orders.create(
 
 order.payment_session_id
 client.orders.fetch(order.order_id).order_status
+client.orders.terminate(order.order_id).order_status # unpaid orders only
 ```
 
-A duplicate merchant `order_id` raises `CashfreePg::ConflictError`. The gem does not retry. If a create times out, fetch the order before trying again.
+A duplicate merchant `order_id` raises `CashfreePg::ConflictError`. The gem does not retry. If a create times out, fetch the order before trying again. `create` also accepts `idempotency_key:`, sent as `x-idempotency-key`.
+
+`terminate` can return `TERMINATION_REQUESTED`. Fetch the order to confirm it reached `TERMINATED`; an order with a successful payment is not terminated.
 
 ## UPI and other payments
 
@@ -62,7 +68,7 @@ client.payments.upi(order, channel: :qr)
 client.payments.upi(order, channel: :collect, upi_id: "testsuccess@gocash")
 ```
 
-`:intent` is sent as Cashfree's channel `link`.
+`:intent` is sent as Cashfree's channel `link`. Other Cashfree UPI fields, such as `upi_expiry_minutes`, are passed through as keywords.
 
 Order Pay from your server needs S2S enabled in the Cashfree dashboard. A 403 is `CashfreePg::PermissionError`.
 
@@ -102,9 +108,12 @@ link = client.payment_links.create(
 
 client.payment_links.fetch(link.link_id)
 client.payment_links.cancel(link.link_id)
+
+paid = client.payment_links.orders(link.link_id) # paid orders; pass status: "ALL" for every order
+client.refunds.create(paid.first.order_id, refund_amount: "10.10", refund_id: "refund_link_1")
 ```
 
-`link.link_url` is the URL to give the customer. Only an `ACTIVE` link can be cancelled.
+`link.link_url` is the URL to give the customer. Only an `ACTIVE` link can be cancelled. Cashfree creates the order when a link is paid, so use `orders` to find the `order_id` for a refund.
 
 ## Errors
 
@@ -141,7 +150,7 @@ event.data
 event.version
 ```
 
-A failed check raises `SignatureVerificationError` and returns no event. The timestamp window is off unless you pass `tolerance:` in seconds. Answer `200` quickly and deduplicate in your app. Details and the optional IP allow-list are in [docs/webhooks.md](docs/webhooks.md).
+A failed check raises `SignatureVerificationError` and returns no event. A blank or missing `secret` also fails. The timestamp window is off unless you pass `tolerance:` in seconds. Answer `200` quickly and deduplicate in your app. Details and the optional IP allow-list are in [docs/webhooks.md](docs/webhooks.md).
 
 ## Example
 
@@ -158,6 +167,13 @@ bin/setup                 # install dependencies
 cp .env.example .env      # optional: sandbox credentials for bin/console
 bundle exec rake          # specs, RuboCop, RBS, and gem contents check
 bin/console               # sandbox only
+```
+
+`spec/integration` calls the real sandbox. It skips unless `CASHFREE_CLIENT_ID` and `CASHFREE_CLIENT_SECRET` are set, and the refund test also needs `CASHFREE_PAID_ORDER_ID`:
+
+```bash
+set -a; source .env; set +a
+bundle exec rspec spec/integration
 ```
 
 Never commit `.env` or real credentials.

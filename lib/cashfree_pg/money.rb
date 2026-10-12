@@ -8,6 +8,8 @@ module CashfreePg
   #
   # Ruby's JSON library turns a raw BigDecimal into a quoted exponent string
   # such as "0.101e2". {Number} emits `10.10` instead.
+  #
+  # @api private
   module Money
     AMOUNT_KEY = /(?:\A|_)amount\z/
 
@@ -20,9 +22,7 @@ module CashfreePg
     def normalize(value)
       case value
       when Hash
-        value.each_with_object({}) do |(key, item), copy|
-          copy[key] = amount_key?(key) ? number_for(item) : normalize(item)
-        end
+        value.to_h { |key, item| [key, key.to_s.match?(AMOUNT_KEY) ? number_for(item) : normalize(item)] }
       when Array
         value.map { |item| normalize(item) }
       else
@@ -31,59 +31,41 @@ module CashfreePg
     end
 
     # @param value [Integer, String, BigDecimal, Float]
-    # @return [BigDecimal]
+    # @return [BigDecimal] rounded half-up to two places
     def coerce(value)
       decimal = case value
-                when Integer then BigDecimal(value)
-                when BigDecimal then value
+                when Integer, BigDecimal then BigDecimal(value)
                 when String then decimal_from_string(value)
                 when Float then decimal_from_float(value)
-                else
-                  raise ArgumentError, "amount must be a String, Integer, or BigDecimal"
+                else raise ArgumentError, "amount must be a String, Integer, or BigDecimal"
                 end
+      raise ArgumentError, "amount is not a number" unless decimal.finite?
+
       decimal.round(2, BigDecimal::ROUND_HALF_UP)
     end
 
-    # @param decimal [BigDecimal]
+    # @param decimal [BigDecimal] already rounded to two places
     # @return [String] unquoted JSON number with two decimal places
     def format_number(decimal)
-      text = decimal.to_s("F")
-      text = "#{text}.00" unless text.include?(".")
-      whole, fraction = text.split(".", 2)
-      "#{whole}.#{fraction.ljust(2, "0")[0, 2]}"
+      whole, fraction = decimal.to_s("F").split(".", 2)
+      "#{whole}.#{fraction.ljust(2, "0")}"
     end
 
-    # @param key [String, Symbol]
-    # @return [Boolean]
-    def amount_key?(key)
-      key.to_s.match?(AMOUNT_KEY)
-    end
-
-    # @param value [Object]
-    # @return [Number, nil]
     def number_for(value)
-      return nil if value.nil?
-
-      Number.new(coerce(value))
+      value.nil? ? nil : Number.new(coerce(value))
     end
 
-    # @param value [String]
-    # @return [BigDecimal]
     def decimal_from_string(value)
-      stripped = value.strip
-      raise ArgumentError, "amount is not a number" if stripped.empty?
-
-      BigDecimal(stripped)
+      BigDecimal(value.strip)
     rescue ArgumentError
       raise ArgumentError, "amount is not a number"
     end
 
-    # @param value [Float]
-    # @return [BigDecimal]
     def decimal_from_float(value)
       warn("CashfreePg received a Float amount; pass a String or BigDecimal", uplevel: 2)
       BigDecimal(value.to_s)
     end
+    private_class_method :number_for, :decimal_from_string, :decimal_from_float
 
     # JSON number that does not use exponent notation.
     class Number

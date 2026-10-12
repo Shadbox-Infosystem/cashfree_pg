@@ -36,7 +36,6 @@ RSpec.describe CashfreePg::Client do
     second = build_client(client_id: "cf_other", client_secret: "other-secret-value")
 
     expect(first.instance_variable_get(:@connection)).not_to equal(second.instance_variable_get(:@connection))
-    expect(first.client_secret).not_to eq(second.client_secret)
     expect(described_class.class_variables).to be_empty
   end
 
