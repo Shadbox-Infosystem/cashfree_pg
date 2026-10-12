@@ -64,13 +64,12 @@ module CashfreePg
     attr_reader client_secret: String
     attr_reader environment: Symbol
     attr_reader api_version: String
-    attr_reader open_timeout: Numeric
-    attr_reader read_timeout: Numeric
     attr_reader base_url: String
 
     def initialize: (client_id: String, client_secret: String, ?environment: Symbol, ?api_version: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?base_url: String?, ?allow_custom_base_url: bool) -> void
-    def get: (String path, ?Hash[untyped, untyped]? params, ?skip_auth: bool) -> Response
+    def get: (String path, ?skip_auth: bool) -> Response
     def post: (String path, ?Hash[untyped, untyped]? body, ?skip_auth: bool, ?idempotency_key: String?) -> Response
+    def patch: (String path, Hash[untyped, untyped] body) -> Response
     def orders: () -> Orders
     def payments: () -> Payments
     def refunds: () -> Refunds
@@ -79,59 +78,48 @@ module CashfreePg
     def to_s: () -> String
   end
 
-  class Request
-    def initialize: (Client client, untyped connection) -> void
-    def perform: (Symbol method, String path, ?body: Hash[untyped, untyped]?, ?params: Hash[untyped, untyped]?, ?skip_auth: bool, ?idempotency_key: String?) -> Response
+  class Resource
+    def initialize: (Client client) -> void
   end
 
-  class Orders
-    def initialize: (Client client) -> void
-    def create: (Hash[untyped, untyped] attrs) -> Response
+  class Orders < Resource
+    def create: (?idempotency_key: String?, **untyped) -> Response
     def fetch: (String order_id) -> Response
+    def terminate: (String order_id) -> Response
   end
 
-  class Refunds
-    def initialize: (Client client) -> void
+  class Refunds < Resource
     def create: (String order_id, ?idempotency_key: String?, **untyped) -> Response
     def fetch: (String order_id, String refund_id) -> Response
     def list: (String order_id) -> Response
   end
 
-  class PaymentLinks
-    def initialize: (Client client) -> void
+  class PaymentLinks < Resource
     def create: (?idempotency_key: String?, **untyped) -> Response
     def fetch: (String link_id) -> Response
     def cancel: (String link_id) -> Response
+    def orders: (String link_id, ?status: String?) -> Array[Response]
   end
 
-  class Payments
+  class Payments < Resource
     CHANNELS: Hash[Symbol, String]
 
-    def initialize: (Client client) -> void
     def list: (String order_id) -> Array[Response]
     def fetch: (String order_id, String cf_payment_id) -> Response
-    def upi: (untyped order, channel: Symbol | String, ?upi_id: String?, ?upi_expiry_minutes: Integer?, ?upi_redirect_url: bool?) -> Response
+    def upi: (untyped order, channel: Symbol | String, ?upi_id: String?, **untyped) -> Response
     def authorize: (String order_id, action: Symbol | String, ?amount: untyped?, ?idempotency_key: String?) -> Response
   end
 
   class Webhook
-    class Event
+    class Event < ::Data
       attr_reader type: String?
       attr_reader time: String?
       attr_reader data: untyped
       attr_reader version: String?
 
-      def initialize: (type: String?, time: String?, data: untyped, version: String?) -> void
+      def self.new: (type: String?, time: String?, data: untyped, version: String?) -> instance
     end
 
     def self.construct_event: (raw_body: String, headers: untyped, secret: String, ?tolerance: Numeric?) -> Event
-    def initialize: (String raw_body, untyped headers, String secret, Numeric? tolerance) -> void
-    def construct: () -> Event
-  end
-
-  module Money
-    def self.normalize: (untyped value) -> untyped
-    def self.coerce: (untyped value) -> untyped
-    def self.format_number: (untyped decimal) -> String
   end
 end

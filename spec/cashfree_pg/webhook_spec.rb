@@ -78,22 +78,37 @@ RSpec.describe CashfreePg::Webhook do
     expect { event_for(headers: forged) }.to raise_error(CashfreePg::SignatureVerificationError, /does not match/)
   end
 
-  it "rejects missing and empty signature headers" do
-    missing = headers_for(body).tap { |headers| headers.delete("x-webhook-signature") }
-    empty = headers_for(body).merge("x-webhook-signature" => " ")
+  it "rejects a blank secret even when the signature uses an empty key" do
+    forged = headers_for(body, key: "")
 
-    expect { event_for(headers: missing) }
-      .to raise_error(CashfreePg::SignatureVerificationError, /signature is missing/)
-    expect { event_for(headers: empty) }.to raise_error(CashfreePg::SignatureVerificationError, /signature is empty/)
+    [nil, "", "  "].each do |blank|
+      expect { described_class.construct_event(raw_body: body, headers: forged, secret: blank) }
+        .to raise_error(CashfreePg::SignatureVerificationError, /secret is missing/)
+    end
   end
 
-  it "rejects missing and empty timestamps" do
-    missing = headers_for(body).tap { |headers| headers.delete("x-webhook-timestamp") }
-    empty = headers_for(body).merge("x-webhook-timestamp" => "")
+  it "rejects missing or blank signature and timestamp headers" do
+    %w[x-webhook-signature x-webhook-timestamp].each do |name|
+      error = /#{name.delete_prefix("x-webhook-")} is missing/
+      missing = headers_for(body).except(name)
+      blank = headers_for(body).merge(name => " ")
 
-    expect { event_for(headers: missing) }
-      .to raise_error(CashfreePg::SignatureVerificationError, /timestamp is missing/)
-    expect { event_for(headers: empty) }.to raise_error(CashfreePg::SignatureVerificationError, /timestamp is empty/)
+      expect { event_for(headers: missing) }.to raise_error(CashfreePg::SignatureVerificationError, error)
+      expect { event_for(headers: blank) }.to raise_error(CashfreePg::SignatureVerificationError, error)
+    end
+  end
+
+  it "rejects an empty body, missing headers, and a signed body that is not a JSON object" do
+    expect { event_for("", headers: headers_for("")) }.to raise_error(CashfreePg::SignatureVerificationError, /empty/)
+    expect { event_for(headers: nil) }.to raise_error(CashfreePg::SignatureVerificationError, /headers are missing/)
+    expect { event_for("[1]", headers: headers_for("[1]")) }
+      .to raise_error(CashfreePg::SignatureVerificationError, /not JSON/)
+    expect { event_for("nope", headers: headers_for("nope")) }
+      .to raise_error(CashfreePg::SignatureVerificationError, /not JSON/)
+  end
+
+  it "returns an immutable event" do
+    expect(event_for).to be_frozen
   end
 
   it "rejects a non-string body and does not leak the secret" do

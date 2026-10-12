@@ -18,18 +18,23 @@ RSpec.describe CashfreePg::Money do
       expect(json).not_to include('"10.10"')
     end
 
-    it "leaves non-amount fields unchanged and walks nested hashes" do
+    it "leaves non-amount fields unchanged and walks nested hashes and arrays" do
       payload = described_class.normalize(
         {
           order_currency: "INR",
           customer_details: { customer_phone: "9999999999" },
+          order_splits: [{ vendor_id: "v1", amount: "1" }],
           order_amount: "1.00"
         }
       )
 
       expect(payload[:order_currency]).to eq("INR")
       expect(payload[:customer_details][:customer_phone]).to eq("9999999999")
-      expect(JSON.generate(payload)).to include('"order_amount":1.00')
+      expect(JSON.generate(payload)).to include('"order_amount":1.00', '"amount":1.00')
+    end
+
+    it "rounds half up to two places" do
+      expect(JSON.generate(described_class.normalize({ order_amount: "10.005" }))).to eq('{"order_amount":10.01}')
     end
 
     it "warns on Float and still sends a JSON number" do
@@ -42,6 +47,8 @@ RSpec.describe CashfreePg::Money do
 
     it "rejects values that are not amounts" do
       expect { described_class.normalize({ order_amount: "abc" }) }
+        .to raise_error(ArgumentError, /not a number/)
+      expect { described_class.normalize({ order_amount: "Infinity" }) }
         .to raise_error(ArgumentError, /not a number/)
       expect { described_class.normalize({ order_amount: Object.new }) }
         .to raise_error(ArgumentError, /String, Integer, or BigDecimal/)

@@ -3,10 +3,6 @@
 RSpec.describe CashfreePg::Request do
   let(:client) { build_client }
 
-  def headers_of(request)
-    request.headers.transform_keys(&:downcase)
-  end
-
   describe "headers and money" do
     it "sends auth, version, request id, and a plain JSON amount" do
       stub_request(:post, sandbox_url("/orders")).to_return(
@@ -109,6 +105,19 @@ RSpec.describe CashfreePg::Request do
         .to raise_error(CashfreePg::TimeoutError, /fetch before retrying/)
 
       expect(a_request(:post, sandbox_url("/orders"))).to have_been_made.once
+    end
+
+    it "raises APIError for a success response that is not JSON" do
+      stub_request(:get, sandbox_url("/orders/x")).to_return(status: 200, body: "<html>")
+
+      expect { client.get("/orders/x") }.to raise_error(CashfreePg::APIError, /invalid JSON/)
+    end
+
+    it "warns that a timed-out PATCH has an unknown outcome" do
+      stub_request(:patch, sandbox_url("/orders/x")).to_raise(Net::ReadTimeout.new("read timeout"))
+
+      expect { client.patch("/orders/x", { order_status: "TERMINATED" }) }
+        .to raise_error(CashfreePg::TimeoutError, /fetch before retrying/)
     end
 
     it "raises ConnectionError when the host cannot be reached" do

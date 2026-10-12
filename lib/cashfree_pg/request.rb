@@ -5,6 +5,8 @@ require "securerandom"
 
 module CashfreePg
   # One HTTPS call. No retries and no logging.
+  #
+  # @api private
   class Request
     STATUS_ERRORS = {
       400 => InvalidRequestError,
@@ -23,17 +25,17 @@ module CashfreePg
       @connection = connection
     end
 
-    # @param method [Symbol] `:get` or `:post`
+    # @param method [Symbol] `:get`, `:post` or `:patch`
     # @param path [String]
     # @param body [Hash, nil]
-    # @param params [Hash, nil]
     # @param skip_auth [Boolean]
     # @param idempotency_key [String, nil]
     # @return [Response]
-    def perform(method, path, body: nil, params: nil, skip_auth: false, idempotency_key: nil)
+    def perform(method, path, body: nil, skip_auth: false, idempotency_key: nil)
       validate_path!(path)
-      remember(method, path, body:, params:, skip_auth:, idempotency_key:)
-      handle(dispatch)
+      @method = method
+      @request_id = SecureRandom.uuid
+      handle(dispatch(request_path(path), body, request_headers(skip_auth, idempotency_key)))
     rescue Faraday::TimeoutError, Timeout::Error
       raise timeout_error
     rescue Faraday::ConnectionFailed, Faraday::SSLError, Errno::ECONNREFUSED, SocketError
@@ -42,29 +44,14 @@ module CashfreePg
 
     private
 
-    def dispatch
-      @connection.public_send(@method, @path) do |req|
-        write_headers(req)
-        req.params.update(stringify_keys(@params)) if @params
-        req.body = JSON.generate(Money.normalize(@body)) if @body
+    def dispatch(path, body, headers)
+      @connection.public_send(@method, path) do |req|
+        req.headers.update(headers)
+        req.body = JSON.generate(Money.normalize(body)) if body
       end
     end
 
-    def remember(method, path, body:, params:, skip_auth:, idempotency_key:)
-      @method = method
-      @path = request_path(path)
-      @body = body
-      @params = params
-      @skip_auth = skip_auth
-      @idempotency_key = idempotency_key
-      @request_id = SecureRandom.uuid
-    end
-
-    def write_headers(req)
-      req.headers.update(request_headers)
-    end
-
-    def request_headers
+    def request_headers(skip_auth, idempotency_key)
       headers = {
         "User-Agent" => "cashfree_pg/#{VERSION} ruby/#{RUBY_VERSION}",
         "Accept" => "application/json",
@@ -72,8 +59,8 @@ module CashfreePg
         "x-api-version" => @client.api_version,
         "x-request-id" => @request_id
       }
-      headers["x-idempotency-key"] = @idempotency_key if @idempotency_key
-      return headers if @skip_auth
+      headers["x-idempotency-key"] = idempotency_key if idempotency_key
+      return headers if skip_auth
 
       headers.merge("x-client-id" => @client.client_id, "x-client-secret" => @client.client_secret)
     end
@@ -87,11 +74,17 @@ module CashfreePg
     end
 
     def success(response, request_id)
-      Response.new(parse_success(response, request_id), status: response.status, request_id: request_id)
+      data = parse_json(response.body)
+      if data.nil?
+        raise APIError.new("invalid JSON response status=#{response.status} request_id=#{request_id}",
+                           status: response.status, request_id: request_id, raw_body: response.body.to_s)
+      end
+
+      Response.new(data, status: response.status, request_id: request_id)
     end
 
     def raise_api_error(response, request_id)
-      payload = parse_error_body(response.body)
+      payload = parse_json(response.body)
       payload = {} unless payload.is_a?(Hash)
       klass = STATUS_ERRORS.fetch(response.status, APIError)
       raise klass.new(
@@ -108,44 +101,25 @@ module CashfreePg
       parts = ["status=#{status}"]
       parts << "code=#{payload["code"]}" if payload["code"]
       parts << "type=#{payload["type"]}" if payload["type"]
-      detail = filter_secret(payload["message"]&.to_s)
-      parts << detail if detail && !detail.empty?
+      detail = payload["message"].to_s.gsub(@client.client_secret, "[FILTERED]")
+      parts << detail unless detail.empty?
       parts << "request_id=#{request_id}"
       parts.join(" ")
     end
 
-    def filter_secret(text)
-      return if text.nil? || text.empty?
-
-      text.gsub(@client.client_secret, "[FILTERED]")
-    end
-
-    def parse_success(response, request_id)
-      text = response.body.to_s
-      return {} if text.strip.empty?
-
-      JSON.parse(text, decimal_class: BigDecimal)
-    rescue JSON::ParserError
-      raise APIError.new(
-        "invalid JSON response status=#{response.status} request_id=#{request_id}",
-        status: response.status,
-        request_id: request_id,
-        raw_body: text
-      )
-    end
-
-    def parse_error_body(raw)
+    # An empty body is `{}`. Invalid JSON is nil.
+    def parse_json(raw)
       text = raw.to_s
       return {} if text.strip.empty?
 
       JSON.parse(text, decimal_class: BigDecimal)
     rescue JSON::ParserError
-      {}
+      nil
     end
 
     def timeout_error
       message = "request timed out request_id=#{@request_id}"
-      message = "#{message}; outcome is unknown; fetch before retrying" if @method == :post
+      message = "#{message}; outcome is unknown; fetch before retrying" unless @method == :get
       TimeoutError.new(message, request_id: @request_id)
     end
 
@@ -158,10 +132,6 @@ module CashfreePg
       return if path.is_a?(String) && path.start_with?("/") && !path.start_with?("//")
 
       raise ArgumentError, "path must be a relative path starting with /"
-    end
-
-    def stringify_keys(params)
-      params.transform_keys(&:to_s)
     end
   end
 end

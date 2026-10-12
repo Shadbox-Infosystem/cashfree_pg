@@ -31,12 +31,6 @@ module CashfreePg
     # @return [String]
     attr_reader :api_version
 
-    # @return [Numeric]
-    attr_reader :open_timeout
-
-    # @return [Numeric]
-    attr_reader :read_timeout
-
     # @return [String]
     attr_reader :base_url
 
@@ -54,20 +48,17 @@ module CashfreePg
       @client_secret = required_string(client_secret, "client_secret")
       @environment = environment
       @api_version = required_string(api_version, "api_version")
-      @open_timeout = open_timeout
-      @read_timeout = read_timeout
       @base_url = resolve_base_url(base_url, allow_custom_base_url)
-      @connection = build_connection
+      @connection = build_connection(open_timeout, read_timeout)
     end
 
     # @param path [String] absolute path on the Cashfree host, such as `/orders`
-    # @param params [Hash, nil] query string
     # @param skip_auth [Boolean] omit client id and secret; `x-api-version` is still sent
     # @return [Response]
     # @example
     #   client.get("/orders/order_123")
-    def get(path, params = nil, skip_auth: false)
-      call(:get, path, params: params, skip_auth: skip_auth)
+    def get(path, skip_auth: false)
+      call(:get, path, skip_auth: skip_auth)
     end
 
     # @param path [String]
@@ -79,6 +70,15 @@ module CashfreePg
     #   client.post("/orders", { order_amount: "10.10", order_currency: "INR" })
     def post(path, body = nil, skip_auth: false, idempotency_key: nil)
       call(:post, path, body: body, skip_auth: skip_auth, idempotency_key: idempotency_key)
+    end
+
+    # @param path [String]
+    # @param body [Hash]
+    # @return [Response]
+    # @example
+    #   client.patch("/orders/order_123", { order_status: "TERMINATED" })
+    def patch(path, body)
+      call(:patch, path, body: body)
     end
 
     # @return [Refunds]
@@ -109,18 +109,14 @@ module CashfreePg
       @payments ||= Payments.new(self)
     end
 
+    # `pp` uses this too, so the secret stays hidden there as well.
+    #
     # @return [String] client secret is always `[FILTERED]`
     def inspect
       "#<CashfreePg::Client environment=#{environment.inspect} api_version=#{api_version.inspect} " \
         "client_id=#{client_id.inspect} client_secret=[FILTERED]>"
     end
     alias to_s inspect
-
-    # @param printer [PP]
-    # @return [void]
-    def pretty_print(printer)
-      printer.text(inspect)
-    end
 
     private
 
@@ -152,7 +148,7 @@ module CashfreePg
       end
     end
 
-    def build_connection
+    def build_connection(open_timeout, read_timeout)
       Faraday.new(url: base_url) do |faraday|
         faraday.options.open_timeout = open_timeout
         faraday.options.timeout = read_timeout
