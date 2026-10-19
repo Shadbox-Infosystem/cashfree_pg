@@ -12,7 +12,7 @@ group :development, :test do
   gem "bundler-audit", "~> 0.9", require: false
   gem "rbs", "~> 4.0", require: false
   gem "rspec", "~> 3.13"
-  gem "rubocop", "~> 1.21", require: false
+  gem "rubocop", "~> 1.92", require: false
   gem "simplecov", "~> 1.3", require: false
   gem "webmock", "~> 3.23"
   gem "yard", "~> 0.9", require: false
