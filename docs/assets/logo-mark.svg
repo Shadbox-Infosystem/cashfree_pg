@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="title">
+  <title id="title">cashfree_pg</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1E2247"/>
+      <stop offset="1" stop-color="#0B0D1F"/>
+    </linearGradient>
+    <linearGradient id="ring" gradientUnits="userSpaceOnUse" x1="336" y1="140" x2="160" y2="372">
+      <stop offset="0" stop-color="#A855F7"/>
+      <stop offset="0.5" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="flow" gradientUnits="userSpaceOnUse" x1="330" y1="0" x2="440" y2="0">
+      <stop offset="0" stop-color="#10B981"/>
+      <stop offset="1" stop-color="#5EEAD4"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.45" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#6366F1" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#6366F1" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#tile)"/>
+  <circle cx="240" cy="256" r="210" fill="url(#glow)"/>
+
+  <g transform="translate(-10 0)">
+    <path d="M336 150 H196 L120 226 V286 L196 362 H336" fill="none" stroke="url(#ring)" stroke-width="52"
+          stroke-linecap="round" stroke-linejoin="round"/>
+
+    <g stroke="url(#flow)" stroke-width="20" stroke-linecap="round">
+      <line x1="350" y1="214" x2="410" y2="214"/>
+      <line x1="336" y1="256" x2="440" y2="256"/>
+      <line x1="350" y1="298" x2="398" y2="298"/>
+    </g>
+
+    <polygon points="162,242 191,206 273,206 302,242 232,314" fill="#E11D48"/>
+    <polygon points="191,206 273,206 251,242 213,242" fill="#FF6B8A"/>
+    <polygon points="162,242 191,206 213,242" fill="#FB3B65"/>
+    <polygon points="273,206 302,242 251,242" fill="#BE123C"/>
+    <polygon points="213,242 251,242 232,314" fill="#F43F5E"/>
+    <polygon points="162,242 213,242 232,314" fill="#C81E4A"/>
+    <polygon points="251,242 302,242 232,314" fill="#9F1239"/>
+    <polygon points="200,213 226,213 218,227 192,227" fill="#FFFFFF" fill-opacity="0.55"/>
+  </g>
+</svg>
