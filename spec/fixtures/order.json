@@ -1,0 +1,13 @@
+{
+  "cf_order_id": "12345",
+  "order_id": "order_123",
+  "entity": "order",
+  "order_currency": "INR",
+  "order_amount": 10.10,
+  "order_status": "ACTIVE",
+  "payment_session_id": "session_test_abc",
+  "customer_details": {
+    "customer_id": "cust_1",
+    "customer_phone": "9999999999"
+  }
+}

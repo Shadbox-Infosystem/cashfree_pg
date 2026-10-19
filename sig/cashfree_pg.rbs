@@ -1,4 +1,125 @@
 module CashfreePg
   VERSION: String
-  # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+
+  class Error < StandardError
+    attr_reader status: Integer?
+    attr_reader code: String?
+    attr_reader type: String?
+    attr_reader request_id: String?
+    attr_reader raw_body: String?
+
+    def initialize: (?String? message, ?status: Integer?, ?code: String?, ?type: String?, ?request_id: String?, ?raw_body: String?) -> void
+    def inspect: () -> String
+  end
+
+  class InvalidRequestError < Error
+  end
+
+  class AuthenticationError < Error
+  end
+
+  class PermissionError < Error
+  end
+
+  class NotFoundError < Error
+  end
+
+  class ConflictError < Error
+  end
+
+  class ValidationError < Error
+  end
+
+  class RateLimitError < Error
+  end
+
+  class APIError < Error
+  end
+
+  class ConnectionError < Error
+  end
+
+  class TimeoutError < Error
+  end
+
+  class SignatureVerificationError < Error
+  end
+
+  class Response
+    attr_reader status: Integer
+    attr_reader request_id: String
+
+    def initialize: (Hash[String, untyped] | Array[untyped] data, status: Integer, request_id: String) -> void
+    def []: (String | Symbol key) -> untyped
+    def dig: (*String | Symbol keys) -> untyped
+    def to_h: () -> (Hash[String, untyped] | Array[untyped])
+  end
+
+  class Client
+    SANDBOX_URL: String
+    PRODUCTION_URL: String
+    DEFAULT_API_VERSION: String
+
+    attr_reader client_id: String
+    attr_reader client_secret: String
+    attr_reader environment: Symbol
+    attr_reader api_version: String
+    attr_reader base_url: String
+
+    def initialize: (client_id: String, client_secret: String, ?environment: Symbol, ?api_version: String, ?open_timeout: Numeric, ?read_timeout: Numeric, ?base_url: String?, ?allow_custom_base_url: bool) -> void
+    def get: (String path, ?skip_auth: bool) -> Response
+    def post: (String path, ?Hash[untyped, untyped]? body, ?skip_auth: bool, ?idempotency_key: String?) -> Response
+    def patch: (String path, Hash[untyped, untyped] body) -> Response
+    def orders: () -> Orders
+    def payments: () -> Payments
+    def refunds: () -> Refunds
+    def payment_links: () -> PaymentLinks
+    def inspect: () -> String
+    def to_s: () -> String
+  end
+
+  class Resource
+    def initialize: (Client client) -> void
+  end
+
+  class Orders < Resource
+    def create: (?idempotency_key: String?, **untyped) -> Response
+    def fetch: (String order_id) -> Response
+    def terminate: (String order_id) -> Response
+  end
+
+  class Refunds < Resource
+    def create: (String order_id, ?idempotency_key: String?, **untyped) -> Response
+    def fetch: (String order_id, String refund_id) -> Response
+    def list: (String order_id) -> Response
+  end
+
+  class PaymentLinks < Resource
+    def create: (?idempotency_key: String?, **untyped) -> Response
+    def fetch: (String link_id) -> Response
+    def cancel: (String link_id) -> Response
+    def orders: (String link_id, ?status: String?) -> Array[Response]
+  end
+
+  class Payments < Resource
+    CHANNELS: Hash[Symbol, String]
+
+    def list: (String order_id) -> Array[Response]
+    def fetch: (String order_id, String cf_payment_id) -> Response
+    def upi: (untyped order, channel: Symbol | String, ?upi_id: String?, **untyped) -> Response
+    def authorize: (String order_id, action: Symbol | String, ?amount: untyped?, ?idempotency_key: String?) -> Response
+  end
+
+  class Webhook
+    class Event < ::Data
+      attr_reader type: String?
+      attr_reader time: String?
+      attr_reader data: untyped
+      attr_reader version: String?
+
+      def self.new: (type: String?, time: String?, data: untyped, version: String?) -> instance
+    end
+
+    def self.construct_event: (raw_body: String, headers: untyped, secret: String, ?tolerance: Numeric?) -> Event
+  end
 end

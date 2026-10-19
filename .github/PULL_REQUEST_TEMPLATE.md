@@ -11,9 +11,6 @@
 - [ ] Tests cover success, error and edge cases
 - [ ] `bundle exec rake` passes locally
 - [ ] No real credentials, tokens or customer data in code, fixtures, logs, screenshots or this description
-- [ ] New sensitive fields are added to `CashfreePg::Redactor`
-- [ ] No `Float` used for amounts; no non-idempotent request made retryable
-- [ ] Public methods have YARD docs; README or `docs/` updated if behaviour changed
+- [ ] No `Float` used for amounts; no POST is auto-retried
+- [ ] Public methods have a short YARD comment; README updated if behaviour changed
 - [ ] `CHANGELOG.md` updated for user-visible changes
-- [ ] `docs/decisions.md` updated for significant choices
-- [ ] `sig/` updated for public API changes

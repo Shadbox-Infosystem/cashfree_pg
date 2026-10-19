@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
 module CashfreePg
-  VERSION = "0.0.0"
+  # Gem version, following Semantic Versioning.
+  VERSION = "0.1.0"
 end

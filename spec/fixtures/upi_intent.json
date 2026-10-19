@@ -1,0 +1,10 @@
+{
+  "action": "custom",
+  "cf_payment_id": "7845123001",
+  "channel": "link",
+  "payment_method": "upi",
+  "data": {
+    "url": "https://sandbox.cashfree.com/pg/view/upi/session_test_abc",
+    "payload": null
+  }
+}

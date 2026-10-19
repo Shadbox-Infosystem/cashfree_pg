@@ -10,6 +10,8 @@ end
 require "cashfree_pg"
 require "webmock/rspec"
 
+Dir[File.expand_path("support/**/*.rb", __dir__)].each { |file| require file }
+
 WebMock.disable_net_connect!
 
 RSpec.configure do |config|
