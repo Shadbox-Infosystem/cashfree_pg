@@ -13,7 +13,7 @@ Until v1.0.0, only the latest released minor version receives security fixes.
 Report privately through either:
 
 - GitHub private vulnerability reporting: the "Report a vulnerability" button under the repository's Security tab, or
-- Email: [muballigh.shahid@gmail.com](mailto:muballigh.shahid@gmail.com) with the subject `cashfree_pg security`.
+- Email: [support@shadbox.com](mailto:support@shadbox.com) with the subject `cashfree_pg security`.
 
 Please include the affected version, a description, and steps to reproduce. **Never include real credentials, customer data or production payloads.** Use sandbox values or redact them.
 

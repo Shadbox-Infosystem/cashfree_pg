@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1126" height="192" viewBox="0 0 1126 192" role="img" aria-label="cashfree_pg payment flow">
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#8c959f"/></marker>
+</defs>
+<clipPath id="c0"><rect x="8" y="8" width="198" height="136" rx="14"/></clipPath>
+<rect x="8" y="8" width="198" height="136" rx="14" fill="#ffffff"/>
+<rect x="8" y="8" width="198" height="6" fill="#2563eb" clip-path="url(#c0)"/>
+<rect x="8" y="8" width="198" height="136" rx="14" fill="none" stroke="#d0d7de"/>
+<circle cx="107.0" cy="48" r="16" fill="#2563eb"/>
+<text x="107.0" y="54" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">1</text>
+<text x="107.0" y="90" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#1f2328">Create order</text>
+<rect x="16" y="104" width="182" height="26" rx="6" fill="#f6f8fa" stroke="#d0d7de"/>
+<text x="107.0" y="121" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" fill="#1f2328">orders.create</text>
+<text x="107.0" y="170" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">on your server</text>
+<line x1="210" y1="76.0" x2="232" y2="76.0" stroke="#8c959f" stroke-width="2" marker-end="url(#a)"/>
+<clipPath id="c1"><rect x="236" y="8" width="198" height="136" rx="14"/></clipPath>
+<rect x="236" y="8" width="198" height="136" rx="14" fill="#ffffff"/>
+<rect x="236" y="8" width="198" height="6" fill="#7c3aed" clip-path="url(#c1)"/>
+<rect x="236" y="8" width="198" height="136" rx="14" fill="none" stroke="#d0d7de"/>
+<circle cx="335.0" cy="48" r="16" fill="#7c3aed"/>
+<text x="335.0" y="54" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">2</text>
+<text x="335.0" y="90" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#1f2328">Customer pays</text>
+<rect x="244" y="104" width="182" height="26" rx="6" fill="#f6f8fa" stroke="#d0d7de"/>
+<text x="335.0" y="121" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" fill="#1f2328">checkout or UPI</text>
+<text x="335.0" y="170" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">on Cashfree</text>
+<line x1="438" y1="76.0" x2="460" y2="76.0" stroke="#8c959f" stroke-width="2" marker-end="url(#a)"/>
+<clipPath id="c2"><rect x="464" y="8" width="198" height="136" rx="14"/></clipPath>
+<rect x="464" y="8" width="198" height="136" rx="14" fill="#ffffff"/>
+<rect x="464" y="8" width="198" height="6" fill="#16a34a" clip-path="url(#c2)"/>
+<rect x="464" y="8" width="198" height="136" rx="14" fill="none" stroke="#d0d7de"/>
+<circle cx="563.0" cy="48" r="16" fill="#16a34a"/>
+<text x="563.0" y="54" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">3</text>
+<text x="563.0" y="90" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#1f2328">Verify webhook</text>
+<rect x="472" y="104" width="182" height="26" rx="6" fill="#f6f8fa" stroke="#d0d7de"/>
+<text x="563.0" y="121" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" fill="#1f2328">Webhook.construct_event</text>
+<text x="563.0" y="170" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">signature check, local</text>
+<line x1="666" y1="76.0" x2="688" y2="76.0" stroke="#8c959f" stroke-width="2" marker-end="url(#a)"/>
+<clipPath id="c3"><rect x="692" y="8" width="198" height="136" rx="14"/></clipPath>
+<rect x="692" y="8" width="198" height="136" rx="14" fill="#ffffff"/>
+<rect x="692" y="8" width="198" height="6" fill="#2563eb" clip-path="url(#c3)"/>
+<rect x="692" y="8" width="198" height="136" rx="14" fill="none" stroke="#d0d7de"/>
+<circle cx="791.0" cy="48" r="16" fill="#2563eb"/>
+<text x="791.0" y="54" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">4</text>
+<text x="791.0" y="90" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#1f2328">Confirm</text>
+<rect x="700" y="104" width="182" height="26" rx="6" fill="#f6f8fa" stroke="#d0d7de"/>
+<text x="791.0" y="121" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" fill="#1f2328">orders.fetch</text>
+<text x="791.0" y="170" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">order_status PAID</text>
+<line x1="894" y1="76.0" x2="916" y2="76.0" stroke="#8c959f" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#a)"/>
+<clipPath id="c4"><rect x="920" y="8" width="198" height="136" rx="14"/></clipPath>
+<rect x="920" y="8" width="198" height="136" rx="14" fill="#ffffff"/>
+<rect x="920" y="8" width="198" height="6" fill="#d97706" clip-path="url(#c4)"/>
+<rect x="920" y="8" width="198" height="136" rx="14" fill="none" stroke="#d0d7de"/>
+<circle cx="1019.0" cy="48" r="16" fill="#d97706"/>
+<text x="1019.0" y="54" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">5</text>
+<text x="1019.0" y="90" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#1f2328">Refund</text>
+<rect x="928" y="104" width="182" height="26" rx="6" fill="#f6f8fa" stroke="#d0d7de"/>
+<text x="1019.0" y="121" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" fill="#1f2328">refunds.create</text>
+<text x="1019.0" y="170" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">optional</text>
+</svg>
