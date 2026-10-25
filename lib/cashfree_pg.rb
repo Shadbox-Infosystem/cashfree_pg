@@ -1,8 +1,17 @@
 # frozen_string_literal: true
 
 require_relative "cashfree_pg/version"
+require_relative "cashfree_pg/errors"
+require_relative "cashfree_pg/money"
+require_relative "cashfree_pg/response"
+require_relative "cashfree_pg/client"
+require_relative "cashfree_pg/resource"
+require_relative "cashfree_pg/orders"
+require_relative "cashfree_pg/payments"
+require_relative "cashfree_pg/refunds"
+require_relative "cashfree_pg/payment_links"
+require_relative "cashfree_pg/webhook"
 
+# Ruby client for the Cashfree Payments API.
 module CashfreePg
-  class Error < StandardError; end
-  # Your code goes here...
 end

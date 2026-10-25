@@ -1,0 +1,17 @@
+[
+  {
+    "cf_payment_id": "12376123",
+    "order_id": "order_123",
+    "entity": "payment",
+    "payment_status": "SUCCESS",
+    "payment_amount": 10.10,
+    "payment_currency": "INR",
+    "payment_group": "upi",
+    "payment_method": {
+      "upi": {
+        "channel": "link",
+        "upi_id": "testsuccess@gocash"
+      }
+    }
+  }
+]
