@@ -45,68 +45,28 @@ The gem talks only to Cashfree over HTTPS. It never handles card data, and it ha
 
 ## 🔄 Payment flow
 
-A full payment with `cashfree_pg`, including the failure paths a production integration has to handle:
+How one payment moves through your app, `cashfree_pg` and Cashfree:
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor Customer
-    participant App as Your Rails app
-    participant Gem as cashfree_pg
-    participant CF as Cashfree PG API
+flowchart LR
+    A(["🛒 <b>Create order</b><br/>orders.create"]) --> B(["💳 <b>Customer pays</b><br/>checkout or UPI"])
+    B --> C(["🔔 <b>Webhook</b><br/>Webhook.construct_event"])
+    C --> D(["✅ <b>Confirm</b><br/>orders.fetch → PAID"])
+    D -. optional .-> E(["↩️ <b>Refund</b><br/>refunds.create"])
 
-    rect rgba(56, 139, 253, 0.10)
-    Note over App,CF: 1 · Create the order on your server
-    App->>Gem: orders.create(order_id, order_amount: "499.00")
-    Gem->>CF: POST /orders<br/>auth headers, x-api-version, x-request-id
-    alt 2xx
-        CF-->>Gem: order + payment_session_id
-        Gem-->>App: Response, amounts as BigDecimal
-    else 409 duplicate order_id
-        Gem-->>App: ConflictError, so fetch the existing order
-    else no response in time
-        Gem-->>App: TimeoutError, never retried, fetch before creating again
-    end
-    end
-
-    rect rgba(163, 113, 247, 0.10)
-    Note over Customer,CF: 2 · Customer pays
-    alt Hosted checkout
-        App-->>Customer: payment_session_id to Cashfree checkout
-        Customer->>CF: pays by UPI, card or netbanking
-    else Server-side UPI (S2S)
-        App->>Gem: payments.upi(order, channel: :intent)
-        Gem->>CF: POST /orders/sessions, no client secret sent
-        CF-->>App: UPI intent link or QR for the customer
-    end
-    end
-
-    rect rgba(46, 160, 67, 0.10)
-    Note over App,CF: 3 · Verify the webhook (runs locally, no network call)
-    CF->>App: POST /webhooks/cashfree, signed body
-    App->>Gem: Webhook.construct_event(raw_body, headers, secret)
-    alt Signature valid
-        Gem-->>App: Event(type, data)
-        App-->>CF: 200 OK at once, work goes to a background job
-    else Tampered or unsigned
-        Gem-->>App: SignatureVerificationError
-        App-->>CF: 400 Bad Request
-    end
-    end
-
-    rect rgba(210, 153, 34, 0.10)
-    Note over App,CF: 4 · Confirm and settle
-    App->>Gem: orders.fetch(order_id)
-    Gem->>CF: GET /orders/{order_id}
-    CF-->>App: order_status PAID
-    opt Refund later
-        App->>Gem: refunds.create(order_id, refund_id, refund_amount)
-        Gem->>CF: POST /orders/{order_id}/refunds
-    end
-    end
+    classDef app fill:#2563eb,stroke:#1e40af,color:#ffffff
+    classDef cashfree fill:#7c3aed,stroke:#5b21b6,color:#ffffff
+    classDef verify fill:#16a34a,stroke:#15803d,color:#ffffff
+    classDef later fill:#d97706,stroke:#b45309,color:#ffffff
+    class A,D app
+    class B cashfree
+    class C verify
+    class E later
 ```
 
-Three rules come out of this flow. **Retries are yours:** the gem never retries, so your own `order_id` and `refund_id` (plus the optional `idempotency_key:`) are what make a retry safe. **Webhooks are signals, not proof:** verify them, deduplicate them (Cashfree redelivers with the same timestamp), and fetch the order when the money matters. **Every response carries a `request_id`:** log it, because it is what Cashfree support asks for.
+- 🔁 **Retries are yours.** The gem never retries. Reuse your own `order_id` or `refund_id` and the call is safe to repeat.
+- 🔔 **Verify, then confirm.** Check the webhook signature, deduplicate repeats, and fetch the order before you fulfil it.
+- 🧾 **Log the `request_id`.** Every response and error carries one, and it is what Cashfree support asks for.
 
 ## 🚀 Quick start
 
