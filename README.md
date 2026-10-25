@@ -47,22 +47,12 @@ The gem talks only to Cashfree over HTTPS. It never handles card data, and it ha
 
 How one payment moves through your app, `cashfree_pg` and Cashfree:
 
-```mermaid
-flowchart LR
-    A(["🛒 <b>Create order</b><br/>orders.create"]) --> B(["💳 <b>Customer pays</b><br/>checkout or UPI"])
-    B --> C(["🔔 <b>Webhook</b><br/>Webhook.construct_event"])
-    C --> D(["✅ <b>Confirm</b><br/>orders.fetch → PAID"])
-    D -. optional .-> E(["↩️ <b>Refund</b><br/>refunds.create"])
-
-    classDef app fill:#2563eb,stroke:#1e40af,color:#ffffff
-    classDef cashfree fill:#7c3aed,stroke:#5b21b6,color:#ffffff
-    classDef verify fill:#16a34a,stroke:#15803d,color:#ffffff
-    classDef later fill:#d97706,stroke:#b45309,color:#ffffff
-    class A,D app
-    class B cashfree
-    class C verify
-    class E later
-```
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/payment-flow-dark.svg">
+    <img src="docs/assets/payment-flow-light.svg" width="100%" alt="Payment flow: 1. create the order with orders.create on your server, 2. the customer pays on Cashfree checkout or UPI, 3. verify the webhook with Webhook.construct_event, 4. confirm with orders.fetch that order_status is PAID, 5. optionally refund with refunds.create">
+  </picture>
+</p>
 
 - 🔁 **Retries are yours.** The gem never retries. Reuse your own `order_id` or `refund_id` and the call is safe to repeat.
 - 🔔 **Verify, then confirm.** Check the webhook signature, deduplicate repeats, and fetch the order before you fulfil it.

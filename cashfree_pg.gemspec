@@ -6,14 +6,14 @@ Gem::Specification.new do |spec|
   spec.name = "cashfree_pg"
   spec.version = CashfreePg::VERSION
   spec.authors = ["Muballigh Faraz"]
-  spec.email = ["muballigh.shahid@gmail.com"]
+  spec.email = ["support@shadbox.com"]
 
   spec.summary = "Unofficial Ruby client for the Cashfree Payments API."
   spec.description = "A small, well-tested Ruby client for Cashfree Payment Gateway APIs: orders, payments, " \
                      "UPI, refunds, payment links and webhook verification. Instance-based, thread-safe, " \
                      "with API version pinning, exact money handling and secrets redacted by default. " \
                      "Not affiliated with or endorsed by Cashfree Payments."
-  spec.homepage = "https://github.com/muballighshahid-dot/cashfree_pg"
+  spec.homepage = "https://github.com/Shadbox-Infosystem/cashfree_pg"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.3.0"
 
