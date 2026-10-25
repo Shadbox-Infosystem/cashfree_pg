@@ -121,7 +121,7 @@ DEPENDENCIES
   rspec (~> 3.13)
   rubocop (~> 1.92)
   simplecov (~> 1.3)
-  webmock (~> 3.29)
+  webmock (~> 3.34)
   yard (~> 0.9)
 
 CHECKSUMS
