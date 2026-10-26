@@ -307,7 +307,7 @@ bin/console                           # IRB with the gem loaded, sandbox only
 | :---: | --- |
 | ✅ | Orders, payments, pre-authorisation, UPI (intent, QR, collect), refunds, payment links |
 | ✅ | Webhook verification, typed errors, exact money, RBS signatures, idempotency keys |
-| ✅ | First RubyGems release (v0.1.0) through the trusted-publishing [release workflow](.github/workflows/release.yml) |
+| 🚧 | First RubyGems release (v0.1.0) through the trusted-publishing [release workflow](.github/workflows/release.yml) |
 | 📋 | Stabilise the public API for v1.0 |
 | 📋 | More PG endpoints, such as Order Pay for cards and netbanking, settlements and subscriptions |
 
